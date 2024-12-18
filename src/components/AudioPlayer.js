@@ -11,9 +11,7 @@ import { MusicContext } from "../context/MusicContext";
 import dummyTrackData from "../context/dummyTrackData";
 
 const AudioPlayer = () => {
-  const { musicList, currentIndex, setCurrentIndex } = useContext(MusicContext);
-  let theAudioPlayer = useContext(MusicContext);
-
+  const { musicList, currentIndex, setCurrentIndex, matrixAudioPlayer, setMatrixAudioPlayer } = useContext(MusicContext);
   const [trackData, setTrackData] = useState(dummyTrackData);
   //const [streamData, setMediaData] = useState(null);
   //const [listData, setBulkTrackData] = useState(null);
@@ -21,14 +19,15 @@ const AudioPlayer = () => {
   const [isLooped, setIsLooped] = useState(false);
   const [musicBarWidth, setMusicBarWidth] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [currentVolume, setCurrentVolume] = useState(1);
+  const [currentVolume, setCurrentVolume] = useState(0.5);
+  let temp = null;
 
   useEffect(() => {
     const fetchData = async (trackId) => {
       try {
         // Fetch ID data
         const trackResponse = await fetch(
-          `https://audius-discovery-6.cultur3stake.com/v1/tracks/${trackId}?app_name=MOODS-TM`
+          `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}?app_name=MOODS-TM`
         );
         if (!trackResponse.ok) {
           console.error(
@@ -37,6 +36,7 @@ const AudioPlayer = () => {
           console.warn(trackId);
         }
         const trackResult = await trackResponse.json();
+        console.debug("Track Data:", trackResult);
         return trackResult;
       } catch (err) {
         console.error(err.message);
@@ -49,35 +49,37 @@ const AudioPlayer = () => {
       fetchData(musicList[0])
       .then((songData) => setTrackData(songData));
       console.log("Song Updated and loaded");
-      updateAudio(musicList[0], theAudioPlayer);
+      console.log(matrixAudioPlayer)
+      updateAudio(musicList[0])
       setCurrentIndex(1)
     }
-  }, [musicList, currentIndex, theAudioPlayer]);
+  }, [musicList, currentIndex, matrixAudioPlayer]);
+
 
   const updateAudio = (trackId) => {
-    theAudioPlayer[0] = new Audio(`https://audius-discovery-6.cultur3stake.com/v1/tracks/${trackId}/stream?app_name=MOODS-TM`);
-    theAudioPlayer[0].addEventListener('timeupdate', updateMusicBar);
-    theAudioPlayer[0].volume = currentVolume;
-    theAudioPlayer[0].currentTime = 0;
-    theAudioPlayer[0].play();
-    setupMediaSession(trackData);
-    return theAudioPlayer;
+    console.log("Updating Audio to", `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}/stream?app_name=MOODS-TM`);
+    matrixAudioPlayer.src = `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}/stream?app_name=MOODS-TM`;
+    console.log("Audio Updated from source");
+    matrixAudioPlayer.addEventListener('timeupdate', updateMusicBar);
+    matrixAudioPlayer.volume = currentVolume;
+    matrixAudioPlayer.currentTime = 0;
+    console.log("Audio Updated with volume and time");
+    matrixAudioPlayer.play();
+    console.log(matrixAudioPlayer)
   };
 
-  const updateAudioPlayer = (trackId) => {
-  };
 
   const playPauseButton = () => {
-    console.log(theAudioPlayer)
-    if (theAudioPlayer['theAudioPlayer'][0].paused) {
-      theAudioPlayer['theAudioPlayer'][0].play();
+    console.log(matrixAudioPlayer)
+    if (matrixAudioPlayer.paused) {
+      matrixAudioPlayer.play();
     } else {
-      theAudioPlayer['theAudioPlayer'][0].pause();
+      matrixAudioPlayer.pause();
     }
   };
 
   const updateMusicBar = () => {
-    setCurrentTime(theAudioPlayer[0].currentTime);
+    setCurrentTime(matrixAudioPlayer.currentTime);
   };
 
   const shuffleButton = () => {
@@ -101,10 +103,11 @@ const AudioPlayer = () => {
   };
 
   const updateCurrentVolume = () => {
-    theAudioPlayer[0].volume = currentVolume;
+    matrixAudioPlayer.volume = currentVolume;
   };
 
   const setupMediaSession = (superTrackData) => {
+    console.log(superTrackData);
     if (navigator.mediaSession) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: superTrackData.data.title,
@@ -124,10 +127,10 @@ const AudioPlayer = () => {
       });
 
       navigator.mediaSession.setActionHandler("play", () => {
-        theAudioPlayer[0].play();
+        matrixAudioPlayer.play();
       });
       navigator.mediaSession.setActionHandler("pause", () => {
-        theAudioPlayer[0].current.pause();
+        matrixAudioPlayer.current.pause();
       });
 
       navigator.mediaSession.setActionHandler("previoustrack", () => {
@@ -337,7 +340,7 @@ const AudioPlayer = () => {
           </div>
           <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse w-full">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400 inline-flex">
-              {new Date(currentTime * 1000).toISOString().substring(14, 19)}
+               { new Date(currentTime * 1000).toISOString().substring(14, 19) }
             </span>
             <div className="w-full bg-base-100 rounded-full h-1.5">
               <div className="bg-primary h-1.5 rounded-full"></div>

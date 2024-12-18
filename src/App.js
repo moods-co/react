@@ -19,7 +19,7 @@ function App() {
     <MusicProvider>
     <Router>
     
-      <Navbar />
+      <Navbar/>
       <div className="container mx-2 sm:mx-auto mt-32">
       <Routes>
         <Route path="/" element={<HomePage />} />

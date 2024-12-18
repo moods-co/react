@@ -15,6 +15,7 @@ function Navbar() {
             <Icon icon="ph:fire-fill" />
             D
         </Link>
+        { window.location.href  }
       </div>
       <div className="navbar-center">
         <SearchBar/>
