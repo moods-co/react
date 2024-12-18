@@ -11,7 +11,13 @@ import { MusicContext } from "../context/MusicContext";
 import dummyTrackData from "../context/dummyTrackData";
 
 const AudioPlayer = () => {
-  const { musicList, currentIndex, setCurrentIndex, matrixAudioPlayer, setMatrixAudioPlayer } = useContext(MusicContext);
+  const {
+    musicList,
+    currentIndex,
+    setCurrentIndex,
+    matrixAudioPlayer,
+    setMatrixAudioPlayer,
+  } = useContext(MusicContext);
   const [trackData, setTrackData] = useState(dummyTrackData);
   //const [streamData, setMediaData] = useState(null);
   //const [listData, setBulkTrackData] = useState(null);
@@ -25,10 +31,12 @@ const AudioPlayer = () => {
     console.log("Audio Player Mounted", currentIndex);
     if (currentIndex >= 0) {
       // Load data from API using the song ID at the currentIndex
-      fetchData(musicList[currentIndex])
-      .then((songData) => setTrackData(songData), (songData) => setupMediaSession(songData));
+      fetchData(musicList[currentIndex]).then(
+        (songData) => setTrackData(songData),
+        (songData) => setupMediaSession(songData)
+      );
       console.log("Song Updated and loaded");
-      updateAudio(musicList[currentIndex])
+      updateAudio(musicList[currentIndex]);
     }
   }, [currentIndex]);
 
@@ -54,17 +62,19 @@ const AudioPlayer = () => {
   };
 
   const updateAudio = (trackId) => {
-    console.log("Updating Audio to", `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}/stream?app_name=MOODS-TM`);
+    console.log(
+      "Updating Audio to",
+      `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}/stream?app_name=MOODS-TM`
+    );
     matrixAudioPlayer.src = `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}/stream?app_name=MOODS-TM`;
     console.log("Audio Updated from source");
-    matrixAudioPlayer.addEventListener('timeupdate', updateMusicBar);
+    matrixAudioPlayer.addEventListener("timeupdate", updateMusicBar);
     matrixAudioPlayer.volume = currentVolume;
     matrixAudioPlayer.currentTime = 0;
     console.log("Audio Updated with volume and time");
     matrixAudioPlayer.play();
-    console.log(matrixAudioPlayer)
+    console.log(matrixAudioPlayer);
   };
-
 
   const playPauseButton = () => {
     if (matrixAudioPlayer.src !== "http://localhost:3000/track.mp3") {
@@ -78,6 +88,7 @@ const AudioPlayer = () => {
 
   const updateMusicBar = () => {
     setCurrentTime(matrixAudioPlayer.currentTime);
+    setMusicBarWidth(matrixAudioPlayer.currentTime / trackData.data.duration * 100);
   };
 
   const shuffleButton = () => {
@@ -239,9 +250,7 @@ const AudioPlayer = () => {
               data-tooltip-target="tooltip-previous"
               type="button"
               className="p-2.5 group rounded-full"
-              onClick={() =>
-                redoTrack()
-              }
+              onClick={() => redoTrack()}
             >
               <Icon
                 icon="streamline:button-previous-solid"
@@ -254,12 +263,14 @@ const AudioPlayer = () => {
               data-tooltip-target="tooltip-pause"
               type="button"
               className="inline-flex items-center justify-center p-2.5 mx-2 font-medium bg-primary rounded-lg"
-              onClick={() =>
-                playPauseButton()
-              }
+              onClick={() => playPauseButton()}
             >
               <Icon
-                icon={matrixAudioPlayer.paused ? "streamline:button-play-solid" : "streamline:button-pause-2-solid"}
+                icon={
+                  matrixAudioPlayer.paused
+                    ? "streamline:button-play-solid"
+                    : "streamline:button-pause-2-solid"
+                }
                 className="text-primary-content"
               />
               <span className="sr-only">Pause Song</span>
@@ -269,9 +280,7 @@ const AudioPlayer = () => {
               data-tooltip-target="tooltip-next"
               type="button"
               className="p-2.5 group rounded-full"
-              onClick={() =>
-                skipTrack()
-              }
+              onClick={() => skipTrack()}
             >
               <Icon
                 icon="streamline:button-next-solid"
@@ -285,7 +294,6 @@ const AudioPlayer = () => {
                 data-tooltip-target="tooltip-restart"
                 type="button"
                 className="p-2.5 group rounded-full "
-
               >
                 <Icon
                   icon="streamline:hearts-symbol-solid"
@@ -309,9 +317,7 @@ const AudioPlayer = () => {
               <div className="modal-box h-96 w-96 relative overflow-y-auto">
                 <h3 className="font-bold text-lg">My Queue</h3>
                 <div>
-                  <div>
-                    
-                  </div>
+                  <div></div>
                 </div>
                 <div className="flex justify-center gap-2 z-10 sticky bottom-0">
                   <button
@@ -345,10 +351,15 @@ const AudioPlayer = () => {
           </div>
           <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse w-full">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400 inline-flex">
-               { new Date(currentTime * 1000).toISOString().substring(14, 19) }
+              {new Date(currentTime * 1000).toISOString().substring(14, 19)}
             </span>
             <div className="w-full bg-base-100 rounded-full h-1.5">
-              <div className="bg-primary h-1.5 rounded-full"></div>
+              <div
+                className="bg-primary h-1.5 rounded-full"
+                style={{
+                  width: `${musicBarWidth}%`,
+                }}
+              ></div>
             </div>
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400 inline-flex">
               {new Date(trackData.data.duration * 1000)
@@ -356,7 +367,6 @@ const AudioPlayer = () => {
                 .substring(14, 19)}
             </span>
           </div>
-
         </div>
         <div className="items-center justify-center hidden ms-auto md:flex">
           <div className="tooltip" data-tip="Not Implemented">
@@ -364,18 +374,17 @@ const AudioPlayer = () => {
               data-tooltip-target="tooltip-playlist"
               type="button"
               className="p-2.5 group rounded-full hover:bg-gray-100 me-1 dark:hover:bg-gray-600"
-              onClick={() =>
-                shuffleButton()
-              }
+              onClick={() => shuffleButton()}
             >
               <Icon icon="streamline:shuffle-solid" className="text-error" />
               <span className="sr-only">Shuffle Tracks</span>
             </button>
           </div>
 
-          <button className="p-2.5 group rounded-full hover:bg-gray-100 me-1  dark:hover:bg-gray-600" onClick={() =>
-            loopButton()
-          }>
+          <button
+            className="p-2.5 group rounded-full hover:bg-gray-100 me-1  dark:hover:bg-gray-600"
+            onClick={() => loopButton()}
+          >
             <Icon
               icon="streamline:arrow-infinite-loop-solid"
               className="text-secondary"
