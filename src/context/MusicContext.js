@@ -4,13 +4,13 @@ export const MusicContext = createContext();
 
 export const MusicProvider = ({ children }) => {
   const [musicList, setMusicList] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [matrixAudioPlayer, setMatrixAudioPlayer] = useState(new Audio(""));
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [matrixAudioPlayer, setMatrixAudioPlayer] = useState(new Audio("/track.mp3"));
 
   const addToMusicList = (value) => {
     if (musicList.length === 0) {
       setMusicList([value]);
-      setCurrentIndex(-1);
+      setCurrentIndex(0);
     } else {
       setMusicList([...musicList, value]);
     }

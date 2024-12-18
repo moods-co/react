@@ -20,41 +20,38 @@ const AudioPlayer = () => {
   const [musicBarWidth, setMusicBarWidth] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentVolume, setCurrentVolume] = useState(0.5);
-  let temp = null;
 
   useEffect(() => {
-    const fetchData = async (trackId) => {
-      try {
-        // Fetch ID data
-        const trackResponse = await fetch(
-          `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}?app_name=MOODS-TM`
+    console.log("Audio Player Mounted", currentIndex);
+    if (currentIndex >= 0) {
+      // Load data from API using the song ID at the currentIndex
+      fetchData(musicList[currentIndex])
+      .then((songData) => setTrackData(songData), (songData) => setupMediaSession(songData));
+      console.log("Song Updated and loaded");
+      updateAudio(musicList[currentIndex])
+    }
+  }, [currentIndex]);
+
+  const fetchData = async (trackId) => {
+    try {
+      // Fetch ID data
+      const trackResponse = await fetch(
+        `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}?app_name=MOODS-TM`
+      );
+      if (!trackResponse.ok) {
+        console.error(
+          `Error fetching ID data: ${trackResponse.status} ${trackResponse.statusText}`
         );
-        if (!trackResponse.ok) {
-          console.error(
-            `Error fetching ID data: ${trackResponse.status} ${trackResponse.statusText}`
-          );
-          console.warn(trackId);
-        }
-        const trackResult = await trackResponse.json();
-        console.debug("Track Data:", trackResult);
-        return trackResult;
-      } catch (err) {
-        console.error(err.message);
         console.warn(trackId);
       }
-    };
-    // eslint-disable-next-line
-    if (currentIndex === -1) {
-      // Load data from API using the song ID at the currentIndex
-      fetchData(musicList[0])
-      .then((songData) => setTrackData(songData));
-      console.log("Song Updated and loaded");
-      console.log(matrixAudioPlayer)
-      updateAudio(musicList[0])
-      setCurrentIndex(1)
+      const trackResult = await trackResponse.json();
+      setupMediaSession(trackResult);
+      return trackResult;
+    } catch (err) {
+      console.error(err.message);
+      console.warn(trackId);
     }
-  }, [musicList, currentIndex, matrixAudioPlayer]);
-
+  };
 
   const updateAudio = (trackId) => {
     console.log("Updating Audio to", `https://blockdaemon-audius-discovery-04.bdnodes.net/v1/tracks/${trackId}/stream?app_name=MOODS-TM`);
@@ -70,11 +67,12 @@ const AudioPlayer = () => {
 
 
   const playPauseButton = () => {
-    console.log(matrixAudioPlayer)
-    if (matrixAudioPlayer.paused) {
-      matrixAudioPlayer.play();
-    } else {
-      matrixAudioPlayer.pause();
+    if (matrixAudioPlayer.src !== "http://localhost:3000/track.mp3") {
+      if (matrixAudioPlayer.paused) {
+        matrixAudioPlayer.play();
+      } else {
+        matrixAudioPlayer.pause();
+      }
     }
   };
 
@@ -92,6 +90,7 @@ const AudioPlayer = () => {
 
   const skipTrack = () => {
     if (currentIndex + 1 < musicList.length) {
+      matrixAudioPlayer.pause();
       setCurrentIndex(currentIndex + 1);
     }
   };
@@ -102,12 +101,14 @@ const AudioPlayer = () => {
     }
   };
 
-  const updateCurrentVolume = () => {
-    matrixAudioPlayer.volume = currentVolume;
+  const updateCurrentVolume = (event) => {
+    console.log(event.target.value);
+    matrixAudioPlayer.volume = event.target.value;
+    setCurrentVolume(event.target.value);
   };
 
   const setupMediaSession = (superTrackData) => {
-    console.log(superTrackData);
+    console.log("SuperTrackData:", superTrackData);
     if (navigator.mediaSession) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: superTrackData.data.title,
@@ -130,7 +131,7 @@ const AudioPlayer = () => {
         matrixAudioPlayer.play();
       });
       navigator.mediaSession.setActionHandler("pause", () => {
-        matrixAudioPlayer.current.pause();
+        matrixAudioPlayer.pause();
       });
 
       navigator.mediaSession.setActionHandler("previoustrack", () => {
@@ -238,6 +239,9 @@ const AudioPlayer = () => {
               data-tooltip-target="tooltip-previous"
               type="button"
               className="p-2.5 group rounded-full"
+              onClick={() =>
+                redoTrack()
+              }
             >
               <Icon
                 icon="streamline:button-previous-solid"
@@ -255,8 +259,7 @@ const AudioPlayer = () => {
               }
             >
               <Icon
-                icon="streamline:button-play-solid"
-                prout="streamline:button-pause-2-solid"
+                icon={matrixAudioPlayer.paused ? "streamline:button-play-solid" : "streamline:button-pause-2-solid"}
                 className="text-primary-content"
               />
               <span className="sr-only">Pause Song</span>
@@ -306,7 +309,9 @@ const AudioPlayer = () => {
               <div className="modal-box h-96 w-96 relative overflow-y-auto">
                 <h3 className="font-bold text-lg">My Queue</h3>
                 <div>
-                  <div></div>
+                  <div>
+                    
+                  </div>
                 </div>
                 <div className="flex justify-center gap-2 z-10 sticky bottom-0">
                   <button
