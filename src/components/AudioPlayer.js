@@ -349,7 +349,7 @@ const AudioPlayer = () => {
               </form>
             </dialog>
           </div>
-          <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse w-full">
+          <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse w-full mb-2">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400 inline-flex">
               {new Date(currentTime * 1000).toISOString().substring(14, 19)}
             </span>
