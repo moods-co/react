@@ -124,6 +124,7 @@ const AudioPlayer = () => {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: superTrackData.data.title,
         artist: `${superTrackData.data.user.name} on MOOD™`,
+        source: "Test",
         artwork: [
           {
             src: superTrackData.data.artwork["480x480"],
@@ -146,11 +147,12 @@ const AudioPlayer = () => {
       });
 
       navigator.mediaSession.setActionHandler("previoustrack", () => {
-        redoTrack();
-      });
-      navigator.mediaSession.setActionHandler("nexttrack", () => {
-        skipTrack();
-      });
+  redoTrack();
+});
+
+navigator.mediaSession.setActionHandler("nexttrack", () => {
+  skipTrack();
+});
     }
   };
 
