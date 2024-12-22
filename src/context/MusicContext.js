@@ -1,4 +1,5 @@
 import { createContext, useState } from 'react';
+import { sdk } from '@audius/sdk'
 
 export const MusicContext = createContext();
 
@@ -16,6 +17,11 @@ export const MusicProvider = ({ children }) => {
     }
   };
 
+  const audiusSdk = sdk({
+    apiKey: 'Your API Key goes here',
+    apiSecret: 'Your API Secret goes here',
+  })
+
   return (
     <MusicContext.Provider
       value={{
@@ -25,6 +31,7 @@ export const MusicProvider = ({ children }) => {
         addToMusicList,
         matrixAudioPlayer,
         setMatrixAudioPlayer,
+        audiusSdk,
       }}
     >
       {children}
