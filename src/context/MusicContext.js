@@ -18,8 +18,8 @@ export const MusicProvider = ({ children }) => {
   };
 
   const audiusSdk = sdk({
-    apiKey: 'Your API Key goes here',
-    apiSecret: 'Your API Secret goes here',
+    apiKey: 'process.env.development.AUDIUS_KEY',
+    apiSecret: 'process.env.development.AUDIUS_SECRET',
   })
 
   return (
