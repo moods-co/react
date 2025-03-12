@@ -1,12 +1,18 @@
-# WAUDIUS v2
-> [!NOTE]
-> All others branches will be deprecated in favor of this one. Please work now on this version of WAUDIUS
+<p align="center">
+  <br/>
+  <img src="https://github.com/moods-co.png#gh-light-mode-only" alt="MOOD's White Logo" width="100">
+  <img src="https://github.com/moods-co.png#gh-dark-mode-only" alt="MOOD's Dark Logo" width="100">
+  <img src="https://cdn.worldvectorlogo.com/logos/react-1.svg" alt="React's Dark Logo" width="100">
 
-# About
-WAUDIUS *v2* is a Web Interface running on the Audius API - so a custom music streaming website. 
+  <br/>
 
-# Why v2 ?
-The first version of WAUDIUS (located @ the branch `main` or `nuxt`) was built on Nuxt.js - and the Audius SDK only work for React.
+  <h1 align="center">MOODS™ REACT</h1>
+  <p align="center">
+    ⚛
+  </p>
+</p>
+
+Welcome to the latest maintenaned version of the mood core !
 
 > [!CAUTION]
-> The Audius SDK could exposed credentials and/or bring security issues. While integrations of teh Favorite & playlists are definitly a must, security is also a big concern to keep in mind
+> The Audius SDK could exposed credentials and/or bring security issues. While integrations of the Favorite & playlists are definitly a must, security is also a big concern to keep in mind. Please do not expose credentials :)
